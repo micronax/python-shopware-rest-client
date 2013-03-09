@@ -1,7 +1,9 @@
 python-shopware-rest-client
 ===========================
 
-A Python REST Client for Shopware 
+A Python REST Client for Shopware  
+  
+**Notice:** This is using python 3.2 !
 
 
 ### USAGE
