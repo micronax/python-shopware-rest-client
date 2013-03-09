@@ -28,7 +28,7 @@ class sapi(object):
 			self.error('Invalid HTTP-Method '+str(method), True)
 
 		url = self.buildHttpQuery(taxonomy, parameters)
-		response, content = self.connection.request(url, method, body=urllib.parse.urlencode(data))
+		response, content = self.connection.request(url, method, body=json.dumps(data))
 
 		data = json.loads(content.decode('utf-8'))
 
