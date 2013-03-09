@@ -4,7 +4,7 @@ python-shopware-rest-client
 A Python REST Client for Shopware 
 
 
-## USAGE
+### USAGE
 	from rest import sapi
 	client = sapi()
 
@@ -14,7 +14,11 @@ A Python REST Client for Shopware
 
 	sapi.post('articles/1', {'name': 'New Article Name'})
 
-## License
+
+### Contribution
+This is just an experimental release - Feel free to contribute your ideas and improvements using pull request
+
+### License
 Licensed under the MIT License
 
 Permission is hereby granted, free of charge, to any person obtaining a copy of this 
