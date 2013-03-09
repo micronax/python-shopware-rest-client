@@ -53,7 +53,7 @@ class sapi(object):
 	def put(self, url, data={}, params={}):
 		return self.call(url, 'PUT', data, params)
 
-	def delete(sekf, url, params={}):
+	def delete(self, url, params={}):
 		return self.call(url, 'DELETE', data, params)
 
 	def error(self, message, exit=False):
