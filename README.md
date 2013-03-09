@@ -5,15 +5,14 @@ A Python REST Client for Shopware
 
 
 ## USAGE
+	from rest import sapi
+	client = sapi()
 
-from rest import sapi
-client = sapi()
+	sapi.setCredentials('username', 'token', 'api_base_url')
 
-sapi.setCredentials('username', 'token', 'api_base_url')
+	articles = sapi.get('articles/1')
 
-articles = sapi.get('articles/1')
-
-sapi.post('articles/1', {'name': 'New Article Name'})
+	sapi.post('articles/1', {'name': 'New Article Name'})
 
 ## License
 Licensed under the MIT License
