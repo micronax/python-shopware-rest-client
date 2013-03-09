@@ -42,7 +42,7 @@ class sapi(object):
 			print(data['message'])
 			quit()
 		else:
-			return data
+			return data['data']
 
 	def get(self, url, params={}):
 		return self.call(url, 'GET', parameters=params)
