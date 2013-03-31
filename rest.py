@@ -44,8 +44,8 @@ class sapi(object):
 		else:
 			return data['data']
 
-	def get(self, url, params={}):
-		return self.call(url, 'GET', parameters=params)
+	def get(self, url, data={}, params={}):
+		return self.call(url, 'GET', parameters=params, data=data)
 
 	def post(self, url, data={}, params={}):
 		return self.call(url, 'POST', data, params)
