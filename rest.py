@@ -3,8 +3,10 @@
 import json
 import httplib2
 from pprint import pprint
+import sys
 
 import urllib
+
 
 class sapi(object):
 	baseurl = ''
@@ -12,10 +14,12 @@ class sapi(object):
 	username = ''
 	token = ''
 
+	debug = False
+
 	validmethods = ['GET', 'PUT', 'POST', 'DELETE']
 
 	def __init__(self):
-		self.connection = httplib2.Http(disable_ssl_certificate_validation=True)
+		self.connection = httplib2.Http( disable_ssl_certificate_validation=True)
 		
 	def setCredentials(self, username, token, baseurl):
 		self.connection.add_credentials(username, token)
@@ -30,17 +34,28 @@ class sapi(object):
 		url = self.buildHttpQuery(taxonomy, parameters)
 		response, content = self.connection.request(url, method, body=json.dumps(data))
 
-		data = json.loads(content.decode('utf-8'))
+		if (response['status'] == '302'):
+			# We have the special case that the call was successful, but no content was submitted, return true
+			return True
+
+		try:
+			data = json.loads(content.decode('utf-8'))
+		except:
+			print(response)
+			print()
+			print(content)
+			quit()
+		
 
 		# Error handling
 		if ('success' not in data):
 			self.error('Invalid response')
 			pprint(data)
-			quit()
-		elif (data['success'] is not True):
-			self.error('API Request failed!')
-			print(data['message'])
-			quit()
+			sys.exit(1)
+		elif (bool(data['success']) is not True):
+			if self.debug:
+				print(data['message'])
+			return False;
 		else:
 			return data['data']
 
@@ -60,7 +75,7 @@ class sapi(object):
 		print('AN ERROR OCCURED:')
 		print(message)
 		if (exit):
-			quit()
+			sys.exit(1)
 
 	def buildHttpQuery(self, taxonomy, parameters):
 		url = self.baseurl + taxonomy;
