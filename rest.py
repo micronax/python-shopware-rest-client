@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 
 import json
-import httplib2
+import lib.httplib2
 from pprint import pprint
 import sys
 
@@ -9,81 +9,83 @@ import urllib
 
 
 class sapi(object):
-	baseurl = ''
+    baseurl = ''
 
-	username = ''
-	token = ''
+    username = ''
+    token = ''
 
-	debug = False
+    debug = False
 
-	validmethods = ['GET', 'PUT', 'POST', 'DELETE']
+    validmethods = ['GET', 'PUT', 'POST', 'DELETE']
 
-	def __init__(self):
-		self.connection = httplib2.Http( disable_ssl_certificate_validation=True)
-		
-	def setCredentials(self, username, token, baseurl):
-		self.connection.add_credentials(username, token)
-		self.username = username
-		self.token = token
-		self.baseurl = baseurl
+    def __init__(self):
+        self.connection = lib.httplib2.Http(disable_ssl_certificate_validation=True)
 
-	def call(self, taxonomy, method = 'GET', data={}, parameters={}):
-		if (method not in self.validmethods):
-			self.error('Invalid HTTP-Method '+str(method), True)
+    def setCredentials(self, username, token, baseurl):
+        self.connection.add_credentials(username, token)
+        self.username = username
+        self.token = token
+        self.baseurl = baseurl
 
-		url = self.buildHttpQuery(taxonomy, parameters)
-		response, content = self.connection.request(url, method, body=json.dumps(data))
+    def call(self, taxonomy, method='GET', data={}, parameters={}):
+        if (method not in self.validmethods):
+            self.error('Invalid HTTP-Method ' + str(method), True)
 
-		if (response['status'] == '302'):
-			# We have the special case that the call was successful, but no content was submitted, return true
-			return True
+        url = self.buildHttpQuery(taxonomy, parameters)
+        response, content = self.connection.request(url, method, body=json.dumps(data))
 
-		try:
-			data = json.loads(content.decode('utf-8'))
-		except:
-			print(response)
-			print()
-			print(content)
-			quit()
-		
+        if (response['status'] == '302'):
+            # We have the special case that the call was successful, but no content was submitted, return true
+            return True
 
-		# Error handling
-		if ('success' not in data):
-			self.error('Invalid response')
-			pprint(data)
-			sys.exit(1)
-		elif (bool(data['success']) is not True):
-			if self.debug:
-				print(data['message'])
-			return False;
-		else:
-			return data['data']
+        try:
+            data = json.loads(content.decode('utf-8'))
+        except:
+            print(response)
+            print()
+            print(content)
 
-	def get(self, url, data={}, params={}):
-		return self.call(url, 'GET', parameters=params, data=data)
 
-	def post(self, url, data={}, params={}):
-		return self.call(url, 'POST', data, params)
+        # Error handling
+        if 'success' not in data:
+            self.error('Invalid response')
+            pprint(data)
+            sys.exit(1)
+        elif bool(data['success'] is not True):
+            if self.debug:
+                print(data['message'])
+            return False
+        else:
+            if 'data' in data:
+                return data['data']
+            else:
+                return True
 
-	def put(self, url, data={}, params={}):
-		return self.call(url, 'PUT', data, params)
+    def get(self, url, data={}, params={}):
+        return self.call(url, 'GET', parameters=params, data=data)
 
-	def delete(self, url, params={}):
-		return self.call(url, 'DELETE', data, params)
+    def post(self, url, data={}, params={}):
+        return self.call(url, 'POST', data, params)
 
-	def error(self, message, exit=False):
-		print('AN ERROR OCCURED:')
-		print(message)
-		if (exit):
-			sys.exit(1)
+    def put(self, url, data={}, params={}):
+        return self.call(url, 'PUT', data, params)
 
-	def buildHttpQuery(self, taxonomy, parameters):
-		url = self.baseurl + taxonomy;
-		url_parts = list(urllib.parse.urlparse(url))
-		query = dict(urllib.parse.parse_qsl(url_parts[4]))
-		query.update(parameters)
+    def delete(self, url, params={}):
+        return self.call(url, 'DELETE', {}, params)
 
-		url_parts[4] = urllib.parse.urlencode(query)
+    def error(self, message, exit=False):
+        print('AN ERROR OCCURED:')
+        print(message)
+        if (exit):
+            sys.exit(1)
 
-		url =  urllib.parse.urlunparse(url_parts)
-		return url
+    def buildHttpQuery(self, taxonomy, parameters):
+        url = self.baseurl + taxonomy;
+        url_parts = list(urllib.parse.urlparse(url))
+        query = dict(urllib.parse.parse_qsl(url_parts[4]))
+        query.update(parameters)
+
+        url_parts[4] = urllib.parse.urlencode(query)
+
+        url = urllib.parse.urlunparse(url_parts)
+        return url
