@@ -5,6 +5,16 @@ import httplib2
 import sys
 import logging
 
+try:
+    from urllib.parse import urlencode
+except ImportError:
+    from urllib import urlencode
+
+try:
+    from urlparse import urlparse, parse_qsl, urlunparse, urljoin
+except ImportError:
+    from urllib.parse import urlparse, parse_qsl, urlunparse, urljoin
+
 
 logger = logging.getLogger(__name__)
 
@@ -14,16 +24,6 @@ logger = logging.getLogger(__name__)
 # if you want to see the log on your terminal you can use the StreamHandler:
 #   sh = logging.StreamHandler()
 #   logger.addHandler(sh)
-
-
-try:
-    from urllib.parse import urlencode
-except ImportError:
-    from urllib import urlencode
-try:
-    from urlparse import urlparse, parse_qsl, urlunparse, urljoin
-except ImportError:
-    from urllib.parse import urlparse, parse_qsl, urlunparse, urljoin
 
 
 class sapi(object):

@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
-from shopware_rest import sapi
+from shopware_rest import rest
 
-client = sapi()
+client = rest.sapi()
 client.setCredentials(
     'username',
     'SOME_TOKEN',

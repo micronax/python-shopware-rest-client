@@ -5,4 +5,4 @@ try:
 except:
     __version__ = 'unknown'
 
-from .sapi import sapi
+__all__ = ['rest']
