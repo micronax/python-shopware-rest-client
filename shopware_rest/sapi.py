@@ -2,13 +2,28 @@
 
 import json
 import httplib2
-from pprint import pprint
 import sys
+import logging
 
-import urllib
-from urllib import urlencode
-# TODO: urllib.parse.parse_qsl for python 3
-from urlparse import urlparse, parse_qsl, urlunparse
+
+logger = logging.getLogger(__name__)
+
+# you can set the log level to debug to see every url request
+#   logger.setLevel(logging.DEBUG)
+
+# if you want to see the log on your terminal you can use the StreamHandler:
+#   sh = logging.StreamHandler()
+#   logger.addHandler(sh)
+
+
+try:
+    from urllib.parse import urlencode
+except ImportError:
+    from urllib import urlencode
+try:
+    from urlparse import urlparse, parse_qsl, urlunparse, urljoin
+except ImportError:
+    from urllib.parse import urlparse, parse_qsl, urlunparse, urljoin
 
 
 class sapi(object):
@@ -16,8 +31,6 @@ class sapi(object):
 
     username = ''
     token = ''
-
-    debug = False
 
     validmethods = ['GET', 'PUT', 'POST', 'DELETE']
 
@@ -33,7 +46,6 @@ class sapi(object):
     def call(self, taxonomy, method='GET', data={}, parameters={}):
         if (method not in self.validmethods):
             self.error('Invalid HTTP-Method ' + str(method), True)
-
         url = self.buildHttpQuery(taxonomy, parameters)
         response, content = self.connection.request(url, method, body=json.dumps(data))
 
@@ -44,19 +56,16 @@ class sapi(object):
         try:
             data = json.loads(content.decode('utf-8'))
         except:
-            print(response)
-            print()
-            print(content)
+            logger.error(response)
+            logger.info(content)
 
 
         # Error handling
         if 'success' not in data:
-            self.error('Invalid response')
-            pprint(data)
-            sys.exit(1)
+            logger.info(data)
+            self.error('Invalid response', exit=True)
         elif bool(data['success'] is not True):
-            if self.debug:
-                print(data['message'])
+            logger.debug(data['message'])
             return False
         else:
             if 'data' in data:
@@ -77,13 +86,17 @@ class sapi(object):
         return self.call(url, 'DELETE', {}, params)
 
     def error(self, message, exit=False):
-        print('AN ERROR OCCURED:')
-        print(message)
+        logger.error('AN ERROR OCCURED:')
+        logger.error(message)
         if (exit):
             sys.exit(1)
 
     def buildHttpQuery(self, taxonomy, parameters):
-        url = self.baseurl + taxonomy;
+        if taxonomy.startswith('/'):
+            taxonomy = taxonomy[1:]
+        if not self.baseurl.endswith('/'):
+            self.baseurl += '/'
+        url = urljoin(self.baseurl, taxonomy)
         url_parts = list(urlparse(url))
         query = dict(parse_qsl(url_parts[4]))
         query.update(parameters)
@@ -91,4 +104,5 @@ class sapi(object):
         url_parts[4] = urlencode(query)
 
         url = urlunparse(url_parts)
+        logger.debug(url)
         return url

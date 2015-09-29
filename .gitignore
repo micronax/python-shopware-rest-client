@@ -1,4 +1,6 @@
 *.py[cod]
+.cache/
+htmlcov/
 
 # C extensions
 *.so
