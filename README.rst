@@ -8,13 +8,12 @@ A Python REST Client for Shopware
 
 Usage
 =====
+.. code-block:: python
+
     from shopware_rest import rest
     client = rest.sapi()
-
     client.setCredentials('username', 'token', 'api_base_url')
-
     articles = client.get('articles/1')
-
     client.post('articles/1', {'name': 'New Article Name'})
 
 
