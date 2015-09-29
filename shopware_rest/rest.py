@@ -45,24 +45,34 @@ class sapi(object):
 
     def call(self, taxonomy, method='GET', data={}, parameters={}):
         if (method not in self.validmethods):
-            self.error('Invalid HTTP-Method ' + str(method), True)
+            self.error('Invalid HTTP-Method ' + str(method), exit=True)
         url = self.buildHttpQuery(taxonomy, parameters)
-        response, content = self.connection.request(url, method, body=json.dumps(data))
+        response, content = self.connection.request(
+            url, method, body=json.dumps(data))
+
+        logger.debug('request: {}'.format(url))
+        logger.debug(' * method: {}'.format(method))
+        logger.debug(' * body: {}'.format(json.dumps(data, indent=2)))
 
         if (response['status'] == '302'):
-            # We have the special case that the call was successful, but no content was submitted, return true
+            # We have the special case that the call was successful,
+            # but no content was submitted, return true
             return True
 
         try:
             data = json.loads(content.decode('utf-8'))
         except:
-            logger.error(response)
-            logger.info(content)
+            if logger.level > logging.DEBUG:
+                # print url even if we are not at debug level because of error
+                logger.info('request: {}'.format(url))
+            logger.info(' * response: {}'.format(response))
+            logger.info(' * content: {}'.format(content))
+            self.error('could not load data', False)
 
 
         # Error handling
         if 'success' not in data:
-            logger.info(data)
+            logger.info('data: {}'.format(json.dumps(data, indent=2)))
             self.error('Invalid response', exit=True)
         elif bool(data['success'] is not True):
             logger.debug(data['message'])
@@ -86,7 +96,6 @@ class sapi(object):
         return self.call(url, 'DELETE', {}, params)
 
     def error(self, message, exit=False):
-        logger.error('AN ERROR OCCURED:')
         logger.error(message)
         if (exit):
             sys.exit(1)
@@ -104,5 +113,4 @@ class sapi(object):
         url_parts[4] = urlencode(query)
 
         url = urlunparse(url_parts)
-        logger.debug(url)
         return url
