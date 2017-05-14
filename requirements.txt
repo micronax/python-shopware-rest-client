@@ -2,3 +2,4 @@
 # numpy
 # scipy>=0.9
 httplib2
+multidimensional_urlencode

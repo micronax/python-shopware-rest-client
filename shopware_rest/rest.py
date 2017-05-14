@@ -6,9 +6,12 @@ import sys
 import logging
 
 try:
-    from urllib.parse import urlencode
+    from multidimensional_urlencode import urlencode
 except ImportError:
-    from urllib import urlencode
+    try:
+        from urllib.parse import urlencode
+    except ImportError:
+        from urllib import urlencode
 
 try:
     from urlparse import urlparse, parse_qsl, urlunparse, urljoin
