@@ -3,7 +3,7 @@ shopware_rest
 =============
 
 
-A Python REST Client for Shopware
+A Python REST Client for Shopware 5 (https://developers.shopware.com/developers-guide/rest-api/)
 
 
 Usage
